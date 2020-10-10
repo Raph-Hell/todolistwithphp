@@ -81,12 +81,28 @@ $connect = mysqli_connect($server, $username, $password, $db);
             <?php
         }
         if (isset($_GET['view'])){
+            $noToDisplay = 4;
+
+            if (!isset($_GET['page'])){
+                $pageNo = 1;
+            }
+            else{
+                $pageNo = $_GET['page'];
+            }
+
+            $start = ($pageNo - 1) * $noToDisplay;
+
             ?>
             <div class="table-holder">
                 <h2 class="header">Todo Items</h2>
 
                 <?php
-                $query = "SELECT * FROM `todo`";
+                $query1 = "SELECT * FROM `todo`";
+                $result1 = mysqli_query($connect, $query1);
+                $num = mysqli_num_rows($result1);
+                $noOfPages = ceil($num / $noToDisplay);
+
+                $query = "SELECT * FROM `todo` LIMIT {$start},{$noToDisplay}";
                 $result2 = mysqli_query($connect, $query);
                 if (mysqli_num_rows($result2) > 0){
                 $x = 1;
@@ -130,6 +146,17 @@ $connect = mysqli_connect($server, $username, $password, $db);
                     ?>
                     </tbody>
                 </table>
+                <div style="margin: 10px 0px; ">
+                    <?php
+                    if($noOfPages > 1){
+                        for ($x = 1; $x <= $noOfPages; $x++){
+                            ?>
+                            <a href="index.php?view&page=<?php echo $x; ?>" class="links <?php if ($pageNo == $x){ echo "active";} ?>"><?php echo $x; ?></a>
+                            <?php
+                        }
+                    }
+                    ?>
+                </div>
             </div>
             <?php
         }
